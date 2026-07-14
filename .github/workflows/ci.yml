@@ -45,4 +45,6 @@ jobs:
     uses: ahincho/nova-devops/.github/workflows/reusable-sbom.yml@main
     with:
       build-tool: gradle
+    permissions:
+      contents: write
     secrets: inherit
