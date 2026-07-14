@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.1](https://github.com/ahincho/nova-java-api-standard-quarkus-extension/compare/v1.1.0...v1.1.1) (2026-07-14)
+
+
+### Bug Fixes
+
+* **ci:** apply checkstyle plugin (was missing, made checkstyleMain task fail) ([a694b60](https://github.com/ahincho/nova-java-api-standard-quarkus-extension/commit/a694b6016bc84ab1a8a2c258c2a13fb3e305571f))
+* **ci:** read nova-api-standard from its own repo + accept NOVA_PACKAGES_READ_TOKEN ([756e4a7](https://github.com/ahincho/nova-java-api-standard-quarkus-extension/commit/756e4a77b1cc7317d5787fbfecd81a60157009db))
+* **quarkus:** use @ServerExceptionMapper instead of ExceptionMapper&lt;Throwable&gt; ([37bd083](https://github.com/ahincho/nova-java-api-standard-quarkus-extension/commit/37bd083e4f6e711868217ae71088a4f431b0f5f7))
+
 ## [1.1.0](https://github.com/ahincho/nova-java-api-standard-quarkus-extension/compare/v1.0.0...v1.1.0) (2026-07-14)
 
 
