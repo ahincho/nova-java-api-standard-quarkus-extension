@@ -4,20 +4,28 @@ import pe.edu.nova.java.libs.api.standard.error.ApiError;
 import pe.edu.nova.java.libs.api.standard.response.ApiResponse;
 
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.ext.ExceptionMapper;
-import jakarta.ws.rs.ext.Provider;
 
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
 /**
- * ExceptionMapper generico que captura cualquier Throwable no mapeado y lo
- * serializa como un {@link ApiResponse} JSON consistente con la convencion
+ * Mapper generico de excepciones para cualquier {@link Throwable} no controlado.
+ * Lo serializa como un {@link ApiResponse} JSON consistente con la convencion
  * definida en {@code nova-java-api-standard}.
  * <p>
- * Pensado para actuar como red de seguridad: las aplicaciones pueden definir
- * sus propios {@link ExceptionMapper} para tipos especificos (e.g.,
- * {@code ConstraintViolationException}, {@code NotFoundException}) y estos
- * tendran precedencia por la especificidad de JAX-RS. Este mapper solo se
+ * <strong>Forma Quarkus idiomatica</strong>: usamos
+ * {@link ServerExceptionMapper @ServerExceptionMapper} (la API especifica de
+ * Quarkus REST / resteasy-reactive) en vez de implementar
+ * {@code ExceptionMapper<Throwable>}. Razon: resteasy-reactive procesa
+ * excepciones desde el dispatch chain ANTES de llegar al JAX-RS standard
+ * ExceptionMapper chain, asi que un {@code ExceptionMapper<Throwable>}
+ * generico nunca se invoca para excepciones lanzadas desde resource methods.
+ * En cambio, {@code @ServerExceptionMapper} es interceptado por el build-time
+ * augmentation de Quarkus y queda registrado como parte del dispatch chain.
+ * <p>
+ * Pensado como red de seguridad: las apps pueden definir sus propios mappers
+ * para tipos especificos (e.g., {@code ConstraintViolationException}) y estos
+ * tendran precedencia por la especificidad JAX-RS. Este mapper solo se
  * ejecuta cuando no hay otro mas especifico.
  * <p>
  * Codigos HTTP asignados:
@@ -29,12 +37,11 @@ import org.jboss.logging.Logger;
  * Mensajes tecnicos (con stack traces) solo se incluyen en responses 5xx para
  * no filtrar detalles internos al cliente en errores de usuario.
  */
-@Provider
-public class ApiExceptionMapper implements ExceptionMapper<Throwable> {
+public class ApiExceptionMapper {
 
     private static final Logger LOG = Logger.getLogger(ApiExceptionMapper.class);
 
-    @Override
+    @ServerExceptionMapper
     public Response toResponse(Throwable exception) {
         int status = resolveStatus(exception);
         String code = resolveCode(exception);
@@ -46,7 +53,7 @@ public class ApiExceptionMapper implements ExceptionMapper<Throwable> {
             LOG.debugf("Client error %d: %s", status, exception.getMessage());
         }
 
-ApiResponse<Object> body = ApiResponse.builder()
+        ApiResponse<Object> body = ApiResponse.builder()
                 .status(status)
                 .error(ApiError.of(code, message))
                 .build();
@@ -84,4 +91,3 @@ ApiResponse<Object> body = ApiResponse.builder()
         return raw == null || raw.isBlank() ? exception.getClass().getSimpleName() : raw;
     }
 }
-
