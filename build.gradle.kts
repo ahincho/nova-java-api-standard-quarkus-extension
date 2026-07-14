@@ -23,6 +23,7 @@ java {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     // GitHub Packages (Nova Platform) — necesario para resolver nova-java-api-standard
     // y futuras libs Nova. GitHub Packages requiere autenticacion incluso para paquetes
@@ -59,7 +60,10 @@ dependencies {
     // Libreria pura Nova - los tipos ApiResponse, ApiError, PageInfo, etc.
     // ArtifactId es `nova-api-standard` (NO `nova-java-api-standard`) — convencion Nova:
     // solo el groupId incluye `java`, el artifactId es `nova-<rol>`.
-    implementation("pe.edu.nova.java.libs:nova-api-standard:1.0.0")
+    // Usamos `api` (no `implementation`) porque los tipos Nova son parte del API
+    // publico del extension: el usuario hace `import pe.edu.nova.java.libs...`
+    // en su codigo. Con `implementation` no estaria disponible en compileClasspath.
+    api("pe.edu.nova.java.libs:nova-api-standard:1.0.0")
 
     // Tests
     // Tests unitarios solo: JUnit puro. Los tests de integracion con @QuarkusTest
@@ -90,6 +94,15 @@ tasks.test {
         events("passed", "skipped", "failed")
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
     }
+}
+
+// Quarkus extensions usan `enforcedPlatform` para el quarkus-bom (es el patron
+// recomendado por Quarkus para alinear todas las versiones). Gradle 9.x marca
+// esto como warning porque enforcedPlatform "leak" a los consumers. Es
+// exactamente lo que queremos: forzar a quien use el extension a usar la misma
+// version del Quarkus platform. Suprimimos la validacion.
+tasks.withType<GenerateModuleMetadata>().configureEach {
+    suppressedValidationErrors.add("enforced-platform")
 }
 
 dependencyCheck {
