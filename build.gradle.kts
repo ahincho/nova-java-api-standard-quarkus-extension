@@ -25,15 +25,17 @@ java {
 repositories {
     mavenLocal()
     mavenCentral()
-    // GitHub Packages (Nova Platform) — necesario para resolver nova-java-api-standard
-    // y futuras libs Nova. GitHub Packages requiere autenticacion incluso para paquetes
-    // public (modelo maven.pkg.github.com/<owner>/<repo> scoped al repo dueno).
-    // En CI: GITHUB_TOKEN esta disponible. Local: exportar GITHUB_TOKEN=ghp_xxx antes
-    // de correr Gradle, o usar Maven Local (publishToMavenLocal) como fallback.
+    // GitHub Packages de nova-java-api-standard (la lib pura que consumimos).
+    // NO usamos el repo URL de este extension porque nova-api-standard NO
+    // esta publicado aqui — esta en su propio repo, como cualquier lib Maven.
+    // NOVA_PACKAGES_READ_TOKEN es el secret que permite cross-repo reads
+    // en CI (GITHUB_TOKEN no sirve para leer packages de otro repo).
+    // Fallback automatico a GITHUB_TOKEN si NOVA_PACKAGES_READ_TOKEN no esta.
     maven {
-        name = "GitHubPackages-Nova"
-        url = uri("https://maven.pkg.github.com/ahincho/nova-java-api-standard-quarkus-extension")
-        val token = System.getenv("GITHUB_TOKEN")
+        name = "GitHubPackages-Nova-ApiStandard"
+        url = uri("https://maven.pkg.github.com/ahincho/nova-java-api-standard")
+        val token = System.getenv("NOVA_PACKAGES_READ_TOKEN")
+            ?: System.getenv("GITHUB_TOKEN")
         if (!token.isNullOrBlank()) {
             credentials {
                 username = System.getenv("GITHUB_ACTOR") ?: "x-access-token"
