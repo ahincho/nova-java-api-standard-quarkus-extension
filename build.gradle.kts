@@ -3,6 +3,7 @@ import org.gradle.api.publish.maven.MavenPublication
 plugins {
     id("java-library")
     id("maven-publish")
+    id("checkstyle")
     id("org.owasp.dependencycheck") version "12.2.2"
     id("org.cyclonedx.bom") version "3.2.4"
 }
@@ -105,6 +106,17 @@ tasks.test {
 // version del Quarkus platform. Suprimimos la validacion.
 tasks.withType<GenerateModuleMetadata>().configureEach {
     suppressedValidationErrors.add("enforced-platform")
+}
+
+checkstyle {
+    // Misma config que el resto de repos Nova (ver config/checkstyle/checkstyle.xml).
+    // Solo lint del main sourceSet; los tests usan wildcards legitimos (Assertions.*,
+    // jqwik.*) que AvoidStarImport marcaria como error.
+    sourceSets = listOf(project.sourceSets.main.get())
+    configFile = rootProject.file("config/checkstyle/checkstyle.xml")
+    // El config define severity=warning para style y severity=error para defectos
+    // reales. Por defecto checkstyleGradle plugin falla en TODO. Solo fallamos
+    // en los modulos con severity=error (UnusedImports, AvoidStarImport, etc.).
 }
 
 dependencyCheck {
