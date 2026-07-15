@@ -18,9 +18,8 @@ jobs:
       config-file: .release-please-config.json
       manifest-file: .release-please-manifest.json
     secrets:
-      # NOVA_RELEASE_PAT es un Personal Access Token (contents:write + pull-requests:write).
-      # GITHUB_TOKEN no funciona aqui porque GitHub no triggerea nuevos workflow runs
-      # (e.g., publish-on-tag.yml) para tags/pushes hechos con el token automatico.
-      # Fallback a GITHUB_TOKEN si el PAT aun no esta configurado (release-please funciona,
-      # solo que el tag que crea no auto-triggeara el publish).
-      GH_TOKEN: ${{ secrets.NOVA_RELEASE_PAT || secrets.GITHUB_TOKEN }}
+      # Solo GITHUB_TOKEN. El publish ahora triggerea via workflow_run (ver
+      # publish-on-tag.yml) en vez de push:tags, asi que NO necesitamos un
+      # PAT para evitar la restriction de GitHub "GITHUB_TOKEN no dispara
+      # workflows downstream". El auto-trigger del publish se preserva.
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
