@@ -1,1 +1,1 @@
-rootProject.name = "nova-api-standard-quarkus-extension"
+rootProject.name = "nova-quarkus-api-ext"

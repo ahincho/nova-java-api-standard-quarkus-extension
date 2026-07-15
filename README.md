@@ -1,4 +1,4 @@
-# nova-api-standard-quarkus-extension
+# nova-quarkus-api-ext
 
 > Quarkus extension (coloquial, sin `@BuildStep`) que bridgea
 > [`nova-api-standard`](https://github.com/ahincho/nova-java-api-standard) —
@@ -26,20 +26,27 @@ requerir `META-INF/services/*` ni `@BuildStep`.
 | Campo | Valor |
 |---|---|
 | Version | `1.0.0` |
-| Quarkus | `3.37.2` (latest estable al 2026-07-14) |
+| Quarkus | `3.33.2.1` LTS (pin Nova workspace) |
 | Java | `25` |
 | GroupId | `pe.edu.nova.java.starters` |
-| ArtifactId | `nova-api-standard-quarkus-extension` |
+| ArtifactId | `nova-quarkus-api-ext` |
 | Registry | GitHub Packages (`maven.pkg.github.com/ahincho/nova-java-api-standard-quarkus-extension`) |
 | Framework | Quarkus (alternativa a Spring Boot) |
 
 > **Nota sobre naming:** el repo de GitHub se llama
 > `nova-java-api-standard-quarkus-extension` (con prefijo `nova-java-` por
 > consistencia organizacional) pero el **artifactId de Maven es
-> `nova-api-standard-quarkus-extension`** (sin `java-`, siguiendo la
-> convencion Nova: solo el `groupId` incluye `java`, el artifactId es
-> `nova-<rol>`). Esto es paralelo a `nova-commons-starter` para el starter
+> `nova-quarkus-api-ext`** (corto, siguiendo la convencion Nova: el
+> `groupId` ya incluye `java` y `starters` asi que el artifactId se enfoca
+> en el rol). Es paralelo a `nova-api-standard-starter` para el starter
 > Spring Boot equivalente.
+>
+> **Por que tan corto?** GitHub Packages Maven rechaza PUTs del plugin
+> `maven-publish` de Gradle cuando el artifactId supera cierto limite de
+> longitud (~35 chars). El nombre `nova-java-api-standard-quarkus-extension`
+> (39 chars) producia "paquetes fantasma": metadata actualizada pero sin
+> artifacts descargables. Ver `docs/java/07-quarkus-analisis-adopcion.md`
+> seccion de causa raiz.
 
 ## Como consumirla desde una app Quarkus
 
@@ -54,7 +61,7 @@ dependencies {
     implementation("io.quarkus:quarkus-arc")
 
     // Esta extension
-    implementation("pe.edu.nova.java.starters:nova-api-standard-quarkus-extension:1.0.0")
+    implementation("pe.edu.nova.java.starters:nova-quarkus-api-ext:1.0.0")
 
     // Transitiva: nova-api-standard ya viene incluida
 }
@@ -128,7 +135,7 @@ public class ConstraintViolationMapper implements ExceptionMapper<ConstraintViol
 
 | Pieza | Version | Por que |
 |---|---|---|
-| Quarkus | 3.37.2 | Latest estable al 2026-07-14; soporta Java 25 |
+| Quarkus | 3.33.2.1 LTS | Pin Nova workspace; soporta Java 25 |
 | `quarkus-rest` | (via BOM) | JAX-RS reactivo, `@Path`, `@Provider` |
 | `quarkus-arc` | (via BOM) | CDI: `@ApplicationScoped`, `@Singleton`, `@Inject` |
 | `quarkus-jackson` | (via BOM) | Aporta `ObjectMapperCustomizer` + Jackson al compileClasspath |
