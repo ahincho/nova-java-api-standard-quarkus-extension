@@ -43,11 +43,11 @@ val junitVersion = "6.0.0"
 
 dependencies {
     // Quarkus REST (JAX-RS reactivo) - necesario para @Path, @Provider, @ServerExceptionMapper
-    implementation("io.quarkus:quarkus-rest:3.37.2")
+    implementation("io.quarkus:quarkus-rest:3.33.2.1")
     // Quarkus ARC (CDI) - necesario para @ApplicationScoped, @Singleton, @Inject
-    implementation("io.quarkus:quarkus-arc:3.37.2")
+    implementation("io.quarkus:quarkus-arc:3.33.2.1")
     // Quarkus Jackson - aporta jackson-databind + la API ObjectMapperCustomizer.
-    implementation("io.quarkus:quarkus-jackson:3.37.2")
+    implementation("io.quarkus:quarkus-jackson:3.33.2.1")
 
     // Libreria pura Nova - los tipos ApiResponse, ApiError, PageInfo, etc.
     api("pe.edu.nova.java.libs:nova-api-standard:1.0.0")
