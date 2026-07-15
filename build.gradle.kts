@@ -3,6 +3,7 @@ import org.gradle.api.publish.maven.MavenPublication
 plugins {
     id("java-library")
     id("maven-publish")
+    id("signing")
     id("checkstyle")
     id("org.owasp.dependencycheck") version "12.2.2"
     id("org.cyclonedx.bom") version "3.2.4"
@@ -171,5 +172,16 @@ publishing {
                 password = System.getenv("GITHUB_TOKEN")
             }
         }
+    }
+}
+
+signing {
+    val gpgKeyId: String? = System.getenv("GPG_SIGNING_KEY_ID")
+    val gpgKey: String? = System.getenv("GPG_SIGNING_KEY")
+    val gpgPassword: String? = System.getenv("GPG_SIGNING_PASSWORD")
+
+    if (gpgKeyId != null && gpgKey != null) {
+        useInMemoryPgpKeys(gpgKeyId, gpgKey, gpgPassword ?: "")
+        sign(publishing.publications)
     }
 }
