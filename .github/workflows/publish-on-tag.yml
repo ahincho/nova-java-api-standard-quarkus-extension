@@ -76,3 +76,10 @@ jobs:
         env:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Used only to READ internal Nova Platform dependencies published in other
+          # repos' GitHub Packages (GITHUB_TOKEN cannot read packages cross-repo).
+          # Without this, the publish task silently no-ops because the build.gradle.kts
+          # can't resolve pe.edu.nova.java.libs:nova-api-standard and Gradle ends up
+          # publishing only metadata (no actual JAR/POM uploads) while reporting
+          # BUILD SUCCESSFUL. See doc 07 §Causa raiz del publish fantasma.
+          NOVA_PACKAGES_READ_TOKEN: ${{ secrets.NOVA_PACKAGES_READ_TOKEN || secrets.NOVA_RELEASE_PAT || secrets.GITHUB_TOKEN }}
