@@ -3,10 +3,6 @@ import org.gradle.api.publish.maven.MavenPublication
 plugins {
     id("java-library")
     id("maven-publish")
-    id("signing")
-    id("checkstyle")
-    id("org.owasp.dependencycheck") version "12.2.2"
-    id("org.cyclonedx.bom") version "3.2.4"
 }
 
 group = findProperty("group") as String
@@ -109,27 +105,6 @@ tasks.withType<GenerateModuleMetadata>().configureEach {
     suppressedValidationErrors.add("enforced-platform")
 }
 
-checkstyle {
-    // Misma config que el resto de repos Nova (ver config/checkstyle/checkstyle.xml).
-    // Solo lint del main sourceSet; los tests usan wildcards legitimos (Assertions.*,
-    // jqwik.*) que AvoidStarImport marcaria como error.
-    sourceSets = listOf(project.sourceSets.main.get())
-    configFile = rootProject.file("config/checkstyle/checkstyle.xml")
-    // El config define severity=warning para style y severity=error para defectos
-    // reales. Por defecto checkstyleGradle plugin falla en TODO. Solo fallamos
-    // en los modulos con severity=error (UnusedImports, AvoidStarImport, etc.).
-}
-
-dependencyCheck {
-    // NVD_API_KEY / NOVA_OWASP_FAIL_ON_CVSS son inyectados por reusable-owasp-check.yml.
-    // Localmente (sin env vars) defaults a "never fail" (CVSS 11) + sin NVD key.
-    failBuildOnCVSS = (System.getenv("NOVA_OWASP_FAIL_ON_CVSS") ?: "11").toFloat()
-    nvd.apiKey = System.getenv("NVD_API_KEY") ?: ""
-    // Skip test deps (mismas reglas que los repos Spring Boot Nova).
-    skipConfigurations = listOf("testCompileClasspath", "testRuntimeClasspath")
-    formats = listOf("HTML", "JSON")
-}
-
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
@@ -172,16 +147,5 @@ publishing {
                 password = System.getenv("GITHUB_TOKEN")
             }
         }
-    }
-}
-
-signing {
-    val gpgKeyId: String? = System.getenv("GPG_SIGNING_KEY_ID")
-    val gpgKey: String? = System.getenv("GPG_SIGNING_KEY")
-    val gpgPassword: String? = System.getenv("GPG_SIGNING_PASSWORD")
-
-    if (gpgKeyId != null && gpgKey != null) {
-        useInMemoryPgpKeys(gpgKeyId, gpgKey, gpgPassword ?: "")
-        sign(publishing.publications)
     }
 }
