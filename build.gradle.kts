@@ -3,6 +3,10 @@ import org.gradle.api.publish.maven.MavenPublication
 plugins {
     id("java-library")
     id("maven-publish")
+    // Genera META-INF/jandex.idx en el JAR para que Quarkus descubra
+    // @ServerExceptionMapper y @Singleton en apps consumidoras sin necesidad
+    // de extension processor ni @BuildStep. Plugin compatible con Gradle 9.x.
+    id("org.kordamp.gradle.jandex") version "2.3.0"
 }
 
 group = findProperty("group") as String
